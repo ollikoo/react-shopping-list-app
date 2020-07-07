@@ -9,12 +9,8 @@ export const client = contentful.createClient({
 
 class ProductList extends React.Component {
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            products: [],
-            children: []
-        }
+    state = {
+        products: []
     }
 
     componentDidMount() {
@@ -44,7 +40,7 @@ class ProductList extends React.Component {
         entry.fields.name['en-US'] = this.state.products[i].fields.name['en-US']
         return entry.update()
         })
-        .then((entry) => console.log(`Entry ${entry.sys.id} updated.`))
+        .then(() => console.log('Entry updated.'))
         .catch(console.error)
     }
 
@@ -55,19 +51,57 @@ class ProductList extends React.Component {
         this.setState({products})
         console.log(this.state.products)
         
-        // Update entry
+        // Update entry to Contenful
         client.getSpace(process.env.REACT_APP_SPACE_ID)
         .then((space) => space.getEntry(product.sys.id))
         .then((entry) => {
         entry.fields.isChecked['en-US'] = this.state.products[i].fields.isChecked['en-US']
         return entry.update()
         })
-        .then((entry) => console.log(`Entry ${entry.sys.id} updated.`))
+        .then((entry) => console.log('Entry updated.'))
+        .catch(console.error)
+    }
+
+    removeItem = (productId) => {
+        const products = this.state.products.filter(product => product.sys.id !== productId)
+        this.setState({products})
+        console.log(this.state.products)
+
+        client.getSpace(process.env.REACT_APP_SPACE_ID)
+        .then((space) => space.getEntry(productId))
+        .then((entry) => {
+            entry.unpublish()
+            console.log('Entry unpublished.')
+            client.getSpace(process.env.REACT_APP_SPACE_ID)
+            .then((space) => space.getEntry(productId))
+            .then((entry) => entry.delete())
+            .then(() => console.log('Entry deleted.'))
+            .catch(console.error)
+        })
         .catch(console.error)
     }
 
     addChildren = () => {
-    
+        let products = [...this.state.products]
+        console.log(this.state.products)
+
+        client.getSpace(process.env.REACT_APP_SPACE_ID)
+        .then((space) => space.createEntry('shoppingList', {
+        fields: {
+            name: {
+                'en-US': ''
+            },
+            isChecked: {
+                'en-US': false
+            }
+        }
+        }))
+        .then((entry) => {
+            products.unshift(entry)
+            this.setState({products: products})
+        })
+        .catch(console.error)
+
     }
 
     render() {
@@ -75,7 +109,15 @@ class ProductList extends React.Component {
             <ul className="product-list">
                 {
                 this.state.products.map((product, index) => 
-                    <Product product={product} key={index} index={index} handleToggle={this.toggleChange} handleValue={this.handleInput} />
+                    <Product 
+                        product={product} 
+                        key={index} 
+                        index={index}
+                        id={product.sys.id} 
+                        handleToggle={this.toggleChange} 
+                        handleValue={this.handleInput} 
+                        handleDelete={this.removeItem} 
+                    />
                 )
                 }
                 <button className="button" onClick={this.addChildren}><i>+</i><p>Add item</p></button>

@@ -1,6 +1,7 @@
 h1, h2, h3, h4, p {
   color: #42331d;
   margin: 0;
+  font-family: 'Kalam', cursive;
 }
 
 .app-container {
@@ -88,6 +89,9 @@ input[type="text"] {
   border: none;
   background-color: transparent;
   color: #42331d;
+  font-family: 'Kalam', cursive;
+  margin-top: 4px;
+  width: 100%;
 }
 
 input[type="text"]:focus {
@@ -103,6 +107,7 @@ input[type="text"]:focus {
   flex-direction: row;
   align-items: center;
   cursor: pointer;
+  opacity: 0.4;
 }
 
 .button:focus {
@@ -112,8 +117,20 @@ input[type="text"]:focus {
 .button p {
   font-size: 10px !important;
   margin-left: 5px;
+  margin-top: 2px;
 }
 
 .button i {
   font-size: 25px;
+  font-style: normal;
+}
+
+.button-remove p {
+  font-size: 10px !important;
+  margin-top: 5px;
+}
+
+.button-remove i {
+  font-size: 20px;
+  font-style: normal;
 }
